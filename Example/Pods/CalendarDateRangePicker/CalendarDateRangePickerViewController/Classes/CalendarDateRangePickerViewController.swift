@@ -208,8 +208,11 @@ extension CalendarDateRangePickerViewController: UICollectionViewDelegateFlowLay
             selectedStartCell = indexPath
             delegate.didSelectStartDate(startDate: selectedStartDate)
         } else if selectedEndDate == nil {
+            if selectedStartCell == nil {
+                selectedStartCell = getIndexPathFromDate(date: selectedStartDate!)
+            }
             if isBefore(dateA: selectedStartDate!, dateB: cellDate) && !isBetween(selectedStartCell!, and: indexPath) {
-                if (getDifferenceOfDay(from: selectedStartDate!, to: cellDate) + 1) > maxSelectableRange, let newIndexPath = getMaxSelectableDateIndexPath() {
+                if (getDifferenceOfDay(from: selectedStartDate!, to: cellDate) + 1) > maxSelectableRange, let newIndexPath = getIndexPathFromDate(date: getMaxSelectableDate() ?? Date()) {
                     // If out of the selection range, select the end point of the selection range
                     selectedEndDate = Calendar.current.date(byAdding: .day, value: maxSelectableRange - 1, to: selectedStartDate ?? Date()) ?? Date()
                     collectionView.scrollToItem(at: newIndexPath, at: .centeredVertically, animated: true)
@@ -374,19 +377,24 @@ extension CalendarDateRangePickerViewController {
         return difference.month ?? 0
     }
 
-    @objc func getMaxSelectableDateIndexPath() -> IndexPath? {
+    @objc func getMaxSelectableDate() -> Date? {
         guard let selectedStartDate = selectedStartDate else { return nil }
         let calendar = Calendar.current
-        let maxSelectableDate = calendar.date(byAdding: .day, value: maxSelectableRange - 1, to: selectedStartDate) ?? Date()
-        let diff = getDifferenceOfMonth(from: selectedStartDate, to: maxSelectableDate)
+        let maxSelectableDate = calendar.date(byAdding: .day, value: maxSelectableRange - 1, to: selectedStartDate)
+        return maxSelectableDate
+    }
+
+    @objc func getIndexPathFromDate(date: Date) -> IndexPath? {
+        guard let selectedStartDate = selectedStartDate else { return nil }
+        let calendar = Calendar.current
+        let diff = getDifferenceOfMonth(from: selectedStartDate, to: date)
         let selectedStartDateSection = getDifferenceOfMonth(from: minimumDate, to: selectedStartDate)
         let section = selectedStartDateSection + diff
         let firstDateForSection = getFirstDateForSection(section: section)
         let weekdayRowItems = 7
         let blankItems = getWeekday(date: firstDateForSection) - 1
-        let day = calendar.dateComponents([.day], from: maxSelectableDate).day ?? 0
-        // "itemOfSection" reduced minus 2, because the selectable range is calculated include the start point and the end point.
-        let itemOfSection = (weekdayRowItems - 1) + blankItems + day - 2
+        let day = calendar.dateComponents([.day], from: date).day ?? 0
+        let itemOfSection = (weekdayRowItems - 1) + blankItems + day
         let indexPath = IndexPath(item: itemOfSection, section: section)
         return indexPath
     }
