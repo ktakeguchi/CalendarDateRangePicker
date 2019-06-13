@@ -38,26 +38,36 @@ class ViewController: UIViewController {
 
 extension ViewController : CalendarDateRangePickerViewControllerDelegate {
     
-    func didCancelPickingDateRange() {
+    func didTapLeftBarButton(startDate: Date?, endDate: Date?) {
         self.navigationController?.dismiss(animated: true, completion: nil)
     }
     
-    func didPickDateRange(startDate: Date!, endDate: Date!) {
+    func didTapRightBarButton(startDate: Date?, endDate: Date?) {
         let dateFormatter = DateFormatter()
         dateFormatter.dateFormat = "EEEE, MMM d, yyyy"
-        label.text = dateFormatter.string(from: startDate) + " to " + dateFormatter.string(from: endDate)
+        var fromText = ""
+        if let startDate = startDate {
+            fromText = dateFormatter.string(from: startDate)
+        }
+        var toText = ""
+        if let endDate = endDate {
+            toText = dateFormatter.string(from: endDate)
+        }
+        label.text = fromText + " to " + toText
         self.navigationController?.dismiss(animated: true, completion: nil)
     }
     
-    @objc func didSelectStartDate(startDate: Date!){
+    @objc func didSelectStartDate(startDate: Date?){
 //        Do something when start date is selected...
+        guard let startDate = startDate else { return }
         let dateFormatter = DateFormatter()
         dateFormatter.dateFormat = "EEEE, MMM d, yyyy"
         print(dateFormatter.string(from: startDate))
     }
     
-    @objc func didSelectEndDate(endDate: Date!){
+    @objc func didSelectEndDate(endDate: Date?){
 //        Do something when end date is selected...
+        guard let endDate = endDate else { return }
         let dateFormatter = DateFormatter()
         dateFormatter.dateFormat = "EEEE, MMM d, yyyy"
         print(dateFormatter.string(from: endDate))
