@@ -116,9 +116,9 @@ extension CalendarDateRangePickerViewController {
         cell.reset()
         let blankItems = getWeekday(date: getFirstDateForSection(section: indexPath.section)) - 1
         if indexPath.item == 0 || (indexPath.item % 7) == 0 {
-            cell.label.textColor = self.saturdayColor
+            cell.label.textColor = self.sundayColor
         } else if (indexPath.item % 7) == 6 {
-            cell.label.textColor = sundayColor
+            cell.label.textColor = self.saturdayColor
         }
         if indexPath.item < 7 {
             cell.label.text = getWeekdayLabel(weekday: indexPath.item + 1)
